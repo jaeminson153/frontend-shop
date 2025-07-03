@@ -15,8 +15,11 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.algorithms.Algorithm;
 import com.example.spring03_shop.config.auth.PrincipalDetails;
 import com.example.spring03_shop.config.jwt.JwtTokenProvider;
 import com.example.spring03_shop.members.dto.AuthInfo;
@@ -105,11 +108,11 @@ public class MembersController {
     //로그아웃
 
     @PreAuthorize("hasAnyRole('ADMIN','USER')")
-    @DeleteMapping(value="/member/logout/{email}")
-    public ResponseEntity<?> logout(@PathVariable("email") String email){
-    //@DeleteMapping(value="/member/logout")
-    //public ResponseEntity<?> logout(@RequestHeader("Authorization-refresh") String refreshToken){
-    	//String email = JWT.require(Algorithm.HMAC512("mySecurityCos")).build().verify(refreshToken).getClaim("memberEmail").toString();
+    //@DeleteMapping(value="/member/logout/{email}")
+    //public ResponseEntity<?> logout(@PathVariable("email") String email){
+    @DeleteMapping(value="/member/logout")
+    public ResponseEntity<?> logout(@RequestHeader("Authorization-refresh") String refreshToken){
+    	String email = JWT.require(Algorithm.HMAC512("mySecurityCos")).build().verify(refreshToken).getClaim("memberEmail").asString();
     	log.info("============= ::::: email::::::{}",email);
     	authService.deleteRefreshToken(email);
     	return ResponseEntity.ok(Map.of("message","로그아웃완료"));
